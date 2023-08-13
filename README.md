@@ -19,7 +19,7 @@ Wurl is very simple to use. Just type `wurl --url <url> -o C:\Users\user\Downloa
 (thats it!!)
 
 ## What is the license for WURL?
-Wurl is licensed under the MIT license. See the LICENSE file for more information.
+Wurl is licensed under the MIT license. See the [LICENSE](https://github.com/0bject-0bject/wurl/blob/42cc6a4871c378270d49b37790c0970de31326f2/LICENSE) file for more information.
 
 ## What is the future of WURL?
 Wurl is currently in development. I plan to add more features to it in the future, such as the ability to download multiple files at once, and more compatability. If you have any suggestions, feel free to open an issue or a pull request.
