@@ -45,6 +45,51 @@ fn split_header(header: &str) -> (String, String) {
     return (header_key, header_value);
 }
 
+fn type_to_extension(mime_type: &str) -> &str {
+    match mime_type {
+        "text/html" => "html",
+        "text/css" => "css",
+        "text/javascript" | "application/x-javascript" => "js",
+        "application/json" => "json",
+        "image/png" => "png",
+        "image/jpg" | "image/jpeg" => "jpg",
+        "image/gif" => "gif",
+        "image/svg+xml" => "svg",
+        "image/x-icon" => "ico",
+        "text/plain" => "txt",
+        "application/pdf" => "pdf",
+        "audio/mpeg" => "mp3",
+        "video/mp4" => "mp4",
+        "video/webm" => "webm",
+        "application/xml" => "xml",
+        "application/zip" => "zip",
+        "application/gzip" => "gz",
+        "application/x-tar" => "tar",
+        "application/x-rar-compressed" => "rar",
+        "application/x-7z-compressed" => "7z",
+        "application/x-msdownload" => "exe",
+        "application/octet-stream" => "bin",
+        "font/ttf" => "ttf",
+        "font/woff" => "woff",
+        "font/woff2" => "woff2",
+        "font/otf" => "otf",
+        "application/vnd.ms-fontobject" => "eot",
+        "audio/wav" => "wav",
+        "image/webp" => "webp",
+        "text/csv" => "csv",
+        "application/vnd.ms-excel" => "xls",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
+        "application/msword" => "doc",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
+        "application/vnd.ms-powerpoint" => "ppt",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation" => "pptx",
+        "application/vnd.oasis.opendocument.text" => "odt",
+        "application/vnd.oasis.opendocument.spreadsheet" => "ods",
+        "application/vnd.oasis.opendocument.presentation" => "odp",
+        _ => "txt",
+    }
+}
+
 fn print_downloading_bar(percent: u32) {
     let bars = percent / 5;
 
@@ -141,8 +186,35 @@ fn main() -> io::Result<()> {
 
     if args.verbose { println!("Recieved response with {}!", response.status())}
 
+    let output_location = match args.output {
+        Some(output) => output,
+        None => {
+            // If the content type is not found, then just use output.txt
+            if let Some(content_type) = response.headers().get("Content-Type") {
+                let content_type = content_type.to_str().unwrap_or("text/plain");
+
+                if args.verbose {
+                    println!("Content-Type: {}", content_type);
+                }
+
+                // Get the extension of the file.
+                let extension = type_to_extension(content_type);
+
+                if args.verbose {
+                    println!("Extension: {}", extension);
+                }
+
+                format!("output.{}", extension)
+            } else {
+                "output.txt".to_string()
+            }
+        }
+    };
+
+    if args.verbose { println!("Output location: {}", output_location)};
+
     // Start downloading the file.
-    download(response, &args.output).unwrap_or_else(|err| {
+    download(response, &output_location).unwrap_or_else(|err| {
         println!("Failed to download file: {err}");
         std::process::exit(1);
     });

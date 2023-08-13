@@ -30,8 +30,7 @@ fn get_args() -> ArgMatches {
             Arg::new("output")
                 .long("output")
                 .short('o')
-                .value_name("dry-run")
-                .required(true)
+                .value_name("output")
                 .help("Output file!"),
         )
         .arg(
@@ -76,7 +75,7 @@ fn validate_url(url: &String) {
 
 pub struct Cli {
     pub url: String,
-    pub output: String,
+    pub output: Option<String>,
     pub type_of_req: String,
     pub header: String,
     pub verbose: bool,
@@ -99,8 +98,7 @@ pub fn args() -> std::io::Result<Cli> {
 
     let output = matches
         .get_one::<String>("output")
-        .map(String::from)
-        .unwrap_or_else(|| "output.txt".to_string());
+        .map(String::from);
 
     let type_of_req = matches
         .get_one::<String>("type")
